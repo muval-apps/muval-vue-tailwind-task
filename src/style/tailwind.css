@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+
+@font-face {
+    font-family: GTHaptik;
+    src: url(/public/font/GTHaptik/GT-Haptik-Bold-2.ttf) format("​ttf");
+}
+
+@tailwind utilities;
+
+@layer components {
+    .code {
+        @apply bg-gray-900 text-gray-300 px-2 py-0.5 rounded-md italic
+    }
+}
