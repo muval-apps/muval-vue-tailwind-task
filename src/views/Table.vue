@@ -3,6 +3,8 @@
         <div class="container flex justify-center mx-auto">
             <div class="flex flex-col">
                 <div class="w-full">
+                    <input type="text" class="px-4 my-3 leading-5 border-yellow-500 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500" placeholder="Search" v-model="searchInput" />
+
                     <div class="border-b border-gray-200 shadow">
                         <table class="table-fixed">
                             <thead class="bg-yellow-600">
@@ -117,37 +119,61 @@
         </div>
     </div>
 </template>
+
 <script>
+    import { onBeforeMount, ref, watchEffect } from 'vue'; 
+
     export default {
-        name: 'Table',
-        data: function () {
-            return {
-                limit: 10,
-                vehicles: [],
-                meta: {}
+        setup() {
+            const limit = ref(10);
+            let vehicles = ref([]);
+            let meta = ref({});
+            const searchInput = ref('');
+
+            watchEffect(() => {
+                getPage(1)
+                console.log(searchInput.value);
+            })
+
+            onBeforeMount(() => {
+                getPage(1)
+            })
+
+            function searchPage() {
+                window.axios.get(`/vehicles?limit=${limit.value}&search=${searchInput.value}`)
+                .then(response => {
+                    vehicles.value = response.data
+                    meta.value = response.data.meta
+                })
+                .catch(function (error) {
+                    console.error('Search Axios', error);
+                })
             }
-        },
-        mounted: function() {
-            this.getPage(1)
-        },
-        methods:  {
-            getPage: function(pageNum) {
-                window.axios.get(`/vehicles?limit=${this.limit}&page=${pageNum}`)
+
+            function getPage(pageNum) {
+                window.axios.get(`/vehicles?limit=${limit.value}&page=${pageNum}&search=${searchInput.value}`)
                 .then(response => {
 
-                    this.vehicles = response.data
-                    this.meta = response.data.meta
+                    vehicles.value = response.data
+                    meta.value = response.data.meta
                 })
                 .catch(function (error) {
                     console.error('Page Axios', error);
                 })
-            },
-            activePage: function(pageNum) {
-                return pageNum == this.meta.current_page ? 'z-10 bg-yellow-50 border-yellow-500' : ''
+            }
+
+            function activePage(pageNum) {
+                return pageNum == meta.value.current_page ? 'z-10 bg-yellow-50 border-yellow-500' : ''
+            }
+
+            return {
+                limit,
+                vehicles,
+                meta,
+                searchInput,
+                getPage,
+                activePage
             }
         }
     }
 </script>
-
-<style>
-</style>
