@@ -132,7 +132,6 @@
 
             watchEffect(() => {
                 getPage(1)
-                console.log(searchInput.value);
             })
 
             onBeforeMount(() => {
